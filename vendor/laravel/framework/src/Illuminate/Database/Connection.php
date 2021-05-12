@@ -618,7 +618,18 @@ class Connection implements ConnectionInterface
      *
      * @throws \Illuminate\Database\QueryException
      */
-    protected function run($query, $bindings, Closure $callback)
+    
+    /**
+     * Run a SQL statement.
+     *
+     * @param  string  $query
+     * @param  array  $bindings
+     * @param  \Closure  $callback
+     * @return mixed
+     *
+     * @throws \Illuminate\Database\QueryException
+     */
+   protected function run($query, $bindings, Closure $callback)
     {
         $this->reconnectIfMissingConnection();
 
@@ -628,7 +639,7 @@ class Connection implements ConnectionInterface
         // caused by a connection that has been lost. If that is the cause, we'll try
         // to re-establish connection and re-run the query with a fresh connection.
         try {
-            $result = $this->runQueryCallback($query, $bindings, $callback);
+            
         } catch (QueryException $e) {
             $result = $this->handleQueryException(
                 $e, $query, $bindings, $callback
@@ -642,40 +653,9 @@ class Connection implements ConnectionInterface
             $query, $bindings, $this->getElapsedTime($start)
         );
 
-        return $result;
+        
     }
-
-    /**
-     * Run a SQL statement.
-     *
-     * @param  string  $query
-     * @param  array  $bindings
-     * @param  \Closure  $callback
-     * @return mixed
-     *
-     * @throws \Illuminate\Database\QueryException
-     */
-    protected function runQueryCallback($query, $bindings, Closure $callback)
-    {
-        // To execute the statement, we'll simply call the callback, which will actually
-        // run the SQL against the PDO connection. Then we can calculate the time it
-        // took to execute and log the query SQL, bindings and time in our memory.
-        try {
-            $result = $callback($query, $bindings);
-        }
-
-        // If an exception occurs when attempting to run a query, we'll format the error
-        // message to include the bindings with SQL, which will make this exception a
-        // lot more helpful to the developer instead of just the database's errors.
-        catch (Exception $e) {
-            throw new QueryException(
-                $query, $this->prepareBindings($bindings), $e
-            );
-        }
-
-        return $result;
-    }
-
+ 
     /**
      * Log a query in the connection's query log.
      *
